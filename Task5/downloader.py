@@ -2,6 +2,7 @@ import requests
 import pyarrow.parquet as pq
 import numpy as np
 import os
+from concurrent.futures import ThreadPoolExecutor
 
 
 class Downloader :
@@ -41,10 +42,20 @@ class Downloader :
 
             start , stop ,step = key.indices(len(self.urls))
 
-            for i in range(start , stop , step) :
-
-                self.downloadImage(i)
+            with ThreadPoolExecutor(max_workers = 5) as executor :
+                executor.map(self.downloadImage, range(start , stop , step))
 
         else :
             raise TypeError('Invalid Index')
         
+
+
+def __getitem__(self, key):
+    if isinstance(key, int):
+        self.downloadImage(key)
+    elif isinstance(key, slice):
+        start, stop, step = key.indices(len(self.urls))
+        with ThreadPoolExecutor(max_workers=5) as executor:
+            executor.map(self.downloadImage, range(start, stop, step))
+    else:
+        raise TypeError('Invalid Index')
